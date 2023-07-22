@@ -7,6 +7,9 @@ import (
 
 type Token interface {
 	TokenType() TokenType
+	Literal() any
+	Lexeme() string
+	Location() int
 }
 
 func WithTokenType(tokenType TokenType, location int) Token {
@@ -24,16 +27,28 @@ type loxToken struct {
 	location  int
 }
 
+func (t loxToken) TokenType() TokenType {
+	return t.tokenType
+}
+
+func (t loxToken) Literal() any {
+	return t.literal
+}
+
+func (t loxToken) Lexeme() string {
+	return t.lexeme
+}
+
+func (t loxToken) Location() int {
+	return t.location
+}
+
 func (t loxToken) String() string {
 	if t.tokenType == Identifier || t.tokenType == String || t.tokenType == Number {
 		return fmt.Sprintf("@%d %s(%s)", t.location, t.tokenType, t.lexeme)
 	}
 
 	return fmt.Sprintf("@%d %s", t.location, t.tokenType)
-}
-
-func (t loxToken) TokenType() TokenType {
-	return t.tokenType
 }
 
 type TokenType int

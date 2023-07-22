@@ -36,6 +36,7 @@ type loxLexer struct {
 	start   int     // Start of a token
 	current int     // Current character
 	tokens  []Token // Produced tokens
+	line    int     // Current line
 }
 
 func (l *loxLexer) Tokenize() []Token {
@@ -43,6 +44,10 @@ func (l *loxLexer) Tokenize() []Token {
 		char := l.currentRune()
 		l.start = l.current
 		l.current++
+
+		if char == '\n' {
+			l.line++
+		}
 
 		switch char {
 		case '(':
@@ -74,7 +79,7 @@ func (l *loxLexer) Tokenize() []Token {
 		case '<':
 			l.addTokenIfNextChar('=', LessEqual, Less)
 		case '"':
-			
+
 		default:
 			if unicode.IsSpace(char) {
 				continue
@@ -89,7 +94,7 @@ func (l *loxLexer) Tokenize() []Token {
 }
 
 func (l *loxLexer) addTokenIfNextChar(char rune, typeIf TokenType, typeElse TokenType) {
-	if rune(l.source[l.current+1]) == char {
+	if l.nextRune() == char {
 		l.addTokenType(typeIf)
 		l.current++
 	} else {
@@ -119,6 +124,13 @@ func (l *loxLexer) handleIdentifier() {
 
 func (l *loxLexer) currentRune() rune {
 	return rune(l.source[l.current])
+}
+
+func (l *loxLexer) nextRune() rune {
+	if l.current+1 >= len(l.source) {
+		return 0
+	}
+	return rune(l.source[l.current+1])
 }
 
 func isIdentifierCharacter(char rune) bool {
